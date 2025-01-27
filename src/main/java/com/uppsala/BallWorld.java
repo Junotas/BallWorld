@@ -142,7 +142,7 @@ class BallPanel extends JPanel implements ActionListener {
     private int width, height;
 
     // Array för flera bollar
-    private Ball[] balls;
+    private final Ball[] balls;
 
     // Timer. Skickar en signal var 50e millisekund till panelen som
     // skickas med som ActionListener.
