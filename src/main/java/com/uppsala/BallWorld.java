@@ -104,6 +104,12 @@ class Ball {
 
         constrain();
     }
+
+    // Metod för uppdatering av bollens storlek
+    public void setDiameter (int newDiameter) {
+        diameter = newDiameter;
+    }
+
 }
 
 // Klassen BallPanel definierar en rityta där bollarna ritas upp. Den
@@ -129,6 +135,9 @@ class BallPanel extends JPanel implements ActionListener {
 
         // Skapa en ny boll
         ball = new Ball( width / 10, height / 5, 5, 5 );
+
+        // ändra bollens storlek (60 var lite väl mycket men ville verkligen se skillnaden)
+        ball.setDiameter(60);
 
         // Sätt bollens rektangulära begränsande område (bounding box)
         ball.setBoundingBox( new Rectangle( 0, 0, width, height ) );
