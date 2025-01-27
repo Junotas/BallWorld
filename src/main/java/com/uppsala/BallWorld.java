@@ -22,26 +22,33 @@ import javax.swing.*;
 // differential (dx,dy)) och en färg.
 
 class Ball {
-    // Standardkonstanter (for alla instanser av Ball) 
+    // Standardkonstanter (for alla instanser av Ball)
     static int        defaultDiameter  = 10;
     static Color      defaultColor     = Color.yellow;
 
-    // Position 
+    // Position
     private int x, y;
 
-    // Hastighet och riktning 
+    // Hastighet och riktning
     private int dx, dy;
 
-    // Diameter (storlek) 
+    // Diameter (storlek)
     private int diameter;
 
-    // Färg 
+    // Färg
     private Color color;
 
-    // Begränsande rektangulära område inom vilket bollen studsar 
+    // Begränsande rektangulära område inom vilket bollen studsar
     private Rectangle box;
 
-    // Konstruktion av nya bollar kräver position och riktning 
+    // Ny boolean för att hantera om bollen växer eller krymper
+    private boolean growing = true;
+
+    // Gränser för storleken på bollen
+    private static final int MIN_DIAMETER = 10;
+    private static final int MAX_DIAMETER = 60;
+
+    // Konstruktion av nya bollar kräver position och riktning
     public Ball( int x0, int y0, int dx0, int dy0 ) {
         x = x0;
         y = y0;
@@ -52,19 +59,19 @@ class Ball {
         diameter = defaultDiameter;
     }
 
-    // Sätt ny färg 
+    // Sätt ny färg
     public void setColor( Color c ) {
         color = c;
     }
 
-    // Sätt nytt begränsande rektangulärt område 
+    // Sätt nytt begränsande rektangulärt område
     public void setBoundingBox( Rectangle r ) {
         box = r;
     }
 
     // Rita ut en boll på givet grafiskt område 
     public void paint( Graphics g ) {
-        // Byt till bollens färg 
+        // Byt till bollens färg
         g.setColor( color );
 
         // Bollen representeras som en fylld cirkel, dvs en ellips (oval)
@@ -102,6 +109,19 @@ class Ball {
         x = x + dx;
         y = y + dy;
 
+        // Puls-logik för att växa och krympa
+        if (growing) {
+            diameter++;
+            if (diameter >= MAX_DIAMETER) {
+                growing = false; // Börja krympa
+            }
+        } else {
+            diameter--;
+            if (diameter <= MIN_DIAMETER) {
+                growing = true; // Börja växa
+            }
+        }
+
         constrain();
     }
 
@@ -121,33 +141,38 @@ class BallPanel extends JPanel implements ActionListener {
     // Bredd och höjd  
     private int width, height;
 
-    // En boll 
-    private Ball ball;
+    // Array för flera bollar
+    private Ball[] balls;
 
     // Timer. Skickar en signal var 50e millisekund till panelen som
     // skickas med som ActionListener.
 
     // Initiera attributen
-    public BallPanel (int width, int height) {
+    public BallPanel(int width, int height) {
         // Ta reda på bredd och höjd för ritytan
         this.width = width;
         this.height = height;
 
-        // Skapa en ny boll
-        ball = new Ball( width / 10, height / 5, 5, 5 );
+        // Skapa flera bollar
+        balls = new Ball[2];
+        balls[0] = new Ball(width / 10, height / 5, 5, 5);
+        balls[1] = new Ball(width / 2, height / 2, -3, 4);
 
-        // ändra bollens storlek (60 var lite väl mycket men ville verkligen se skillnaden)
-        ball.setDiameter(60);
+        // Sätt färg och storlek för bollarna
+        balls[0].setColor(Color.WHITE);
+        balls[0].setDiameter(20);
 
-        // Sätt bollens rektangulära begränsande område (bounding box)
-        ball.setBoundingBox( new Rectangle( 0, 0, width, height ) );
+        balls[1].setColor(Color.RED);
+        balls[1].setDiameter(30);
+
+        // Sätt varje bolls rektangulära begränsande område (bounding box)
+        for (Ball ball : balls) {
+            ball.setBoundingBox(new Rectangle(0, 0, width, height));
+        }
 
         // Starta timern.
         Timer timer = new Timer(50, this);
         timer.start();
-
-        // sätt ny färg på bollen
-        ball.setColor(Color.white);
     }
 
     // Uppdatera (anropas vid omritning, repaint())
@@ -157,42 +182,45 @@ class BallPanel extends JPanel implements ActionListener {
         g.setColor( Color.black );
         g.fillRect( 0, 0, width, height );
 
-        // Rita ut bollen (på svart bakgrund)
-        ball.paint( g );
+        // Rita ut alla bollar (på svart bakgrund)
+        for (Ball ball : balls) {
+            ball.paint(g);
+        }
     }
 
     // När vi får en signal från timern... 
     public void actionPerformed(ActionEvent e) {
-        if(width != getWidth() || height != getHeight())
-            wasResized(getWidth(),getHeight());
-        ball.action();  // Gör vad som är relevant med bollen
-        repaint();      // Gör automatiskt ett anrop till
-        // paintComponent()
+        if (width != getWidth() || height != getHeight())
+            wasResized(getWidth(), getHeight());
+
+        // Uppdatera alla bollar
+        for (Ball ball : balls) {
+            ball.action();
+        }
+        repaint(); // Gör automatiskt ett anrop till paintComponent()
     }
 
     // Anropas om fönstret ändrar storlek
     public void wasResized(int newWidth, int newHeight) {
         width = newWidth;
         height = newHeight;
-        ball.setBoundingBox(new Rectangle(0, 0, width, height));
+        for (Ball ball : balls) {
+            ball.setBoundingBox(new Rectangle(0, 0, width, height));
+        }
     }
 }
-
 
 // Denna klass definierar det fönster som skapas av programmet. Ett
 // fönster (JFrame) skapas där en instans av BallPanel (ritytan)
 // placeras.
-
 public class BallWorld extends JFrame {
 
-    // Skapa en panel 
-
-    public BallWorld () {
-
+    // Skapa en panel
+    public BallWorld() {
         // Lägg till bollpanelen i mitten på ramen.
         Container c = getContentPane();
 
-        BallPanel panel = new BallPanel (180, 180);
+        BallPanel panel = new BallPanel(180, 180);
         c.add(panel, BorderLayout.CENTER);
 
         setSize(200, 200);     // Ramens storlek.
