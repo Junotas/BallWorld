@@ -136,6 +136,9 @@ class BallPanel extends JPanel implements ActionListener {
         // Starta timern.
         Timer timer = new Timer(50, this);
         timer.start();
+
+        // sätt ny färg på bollen
+        ball.setColor(Color.white);
     }
 
     // Uppdatera (anropas vid omritning, repaint())
