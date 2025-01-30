@@ -69,13 +69,13 @@ class Ball {
         box = r;
     }
 
-    // Rita ut en boll på givet grafiskt område 
+    // Rita ut en boll på givet grafiskt område
     public void paint( Graphics g ) {
         // Byt till bollens färg
         g.setColor( color );
 
         // Bollen representeras som en fylld cirkel, dvs en ellips (oval)
-        // med lika höjd och bredd 
+        // med lika höjd och bredd
         g.fillOval( x, y, diameter, diameter );
     }
 
@@ -104,7 +104,7 @@ class Ball {
         }
     }
 
-    // Flytta bollen med aktuell riktning och hastighet ett steg 
+    // Flytta bollen med aktuell riktning och hastighet ett steg
     public void action() {
         x = x + dx;
         y = y + dy;
@@ -188,7 +188,7 @@ class BallPanel extends JPanel implements ActionListener {
         }
     }
 
-    // När vi får en signal från timern... 
+    // När vi får en signal från timern...
     public void actionPerformed(ActionEvent e) {
         if (width != getWidth() || height != getHeight())
             wasResized(getWidth(), getHeight());
@@ -197,7 +197,8 @@ class BallPanel extends JPanel implements ActionListener {
         for (Ball ball : balls) {
             ball.action();
         }
-        repaint(); // Gör automatiskt ett anrop till paintComponent()
+        repaint(); // Gör automatiskt ett anrop till
+        // paintComponent()
     }
 
     // Anropas om fönstret ändrar storlek
